@@ -19,8 +19,8 @@ const sections = [
     { name: "בריאות מנטלית", color: "#F4A460", score: 1 },
     { name: "בריאות פיזית - שינה", color: "#E47283", score: 1 },
     { name: "כסף", color: "#7EB6DD", score: 1 },
-    { name: "צמיחה אישית", color: "#FFD700", score: 1 }
-    { name: "קריירה", color: "#FFD700", score: 1 }
+    { name: "צמיחה אישית", color: "#FFD700", score: 1 },
+    { name: "קריירה", color: "#32D700", score: 1 }
 ];
 
 let maxRadius;
