@@ -65,6 +65,78 @@ function handleClick(event) {
 function drawWheel() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
+    // Move to the center of the canvas
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    
+    // Draw concentric circles
+    for (let i = 1; i <= 10; i++) {
+        const radius = i * radiusStep;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = '#eee';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    }
+
+    // Draw sections
+    const sectionAngle = (Math.PI * 2) / sections.length;
+    sections.forEach((section, index) => {
+        const startAngle = index * sectionAngle - Math.PI / 2; // Adjusting to start at the top
+        const endAngle = startAngle + sectionAngle;
+        const scoreRadius = section.score * radiusStep;
+
+        // Draw filled section to score
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, scoreRadius, startAngle, endAngle);
+        ctx.lineTo(0, 0);
+        ctx.fillStyle = section.color;
+        ctx.fill();
+        
+        // Draw section outline
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, maxRadius, startAngle, endAngle);
+        ctx.lineTo(0, 0);
+        ctx.strokeStyle = '#666';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Add labels
+        const labelRadius = maxRadius + (maxRadius * 0.12); // Position of the label
+        const labelAngle = startAngle + sectionAngle / 2;
+        const labelX = Math.cos(labelAngle) * labelRadius;
+        const labelY = Math.sin(labelAngle) * labelRadius;
+
+        // Draw the label straight (horizontal)
+        ctx.save();
+        ctx.translate(labelX, labelY);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#333';
+        const fontSize = Math.max(12, canvas.width * 0.018);
+        ctx.font = `${fontSize}px Arial`;
+
+        // Now we don't rotate the label, so they will all be horizontal
+        ctx.fillText(section.name, 0, 0);
+        ctx.restore();
+
+        // Add score
+        const scoreX = Math.cos(labelAngle) * (scoreRadius - 20);
+        const scoreY = Math.sin(labelAngle) * (scoreRadius - 20);
+        ctx.font = `bold ${Math.max(12, canvas.width * 0.02)}px Arial`;
+        ctx.fillStyle = '#fff';
+        if (section.score > 1) {
+            ctx.fillText(section.score, scoreX, scoreY);
+        }
+    });
+
+    // Reset transformation
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+}
+
+function drawWheelPrev() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
     // Move to center of canvas
     ctx.translate(canvas.width / 2, canvas.height / 2);
     
