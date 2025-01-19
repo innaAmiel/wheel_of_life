@@ -15,9 +15,9 @@ const sections = [
     { name: "משפחה וחברים", color: "#B666D2", score: 1 },
     { name: "זוגיות", color: "#90C590", score: 1 },
     { name: "תחביבים.זמן פנויה", color: "#6B8DD6", score: 1 },
-    { name: "בריאות פיזית-רפואי", color: "#4E9E4E", score: 1 },
+    { name: "בריאות פיזית", color: "#4E9E4E", score: 1 },
     { name: "בריאות מנטלית", color: "#F4A460", score: 1 },
-    { name: "בריאות פיזית - שינה", color: "#E47283", score: 1 },
+    { name: "מגורים", color: "#E47283", score: 1 },
     { name: "כסף", color: "#7EB6DD", score: 1 },
     { name: "צמיחה אישית", color: "#FFD700", score: 1 },
     { name: "קריירה", color: "#32D700", score: 1 }
