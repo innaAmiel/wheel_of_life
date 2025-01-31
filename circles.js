@@ -6,12 +6,11 @@ const inputContainer = document.getElementById("inputContainer");
 const addSegmentButton = document.getElementById('addSegmentButton');
 
 function resizeCanvas() {
-    const width = window.innerWidth * 0.9; // גודל הקנבס 90% מהמסך
-    const height = window.innerHeight * 0.9; // גובה הקנבס 90% מהמסך
+    const width = window.innerWidth * 0.9;
+    const height = window.innerHeight * 0.9;
     canvas.width = width;
     canvas.height = height;
 
-    // הגדרת המקסימום לפי הצד הקצר של הקנבס
     maxRadius = Math.min(canvas.width, canvas.height) * 0.4;
     radiusStep = maxRadius / 10;
 
@@ -68,7 +67,7 @@ function handleClick(event) {
 
 function drawWheel() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.translate(canvas.width / 2 + 50, canvas.height / 2);  // הוספת 50 פיקסלים לדחייה ימינה
+    ctx.translate(canvas.width / 2 + 50, canvas.height / 2);
     
     for (let i = 1; i <= 10; i++) {
         const radius = i * radiusStep;
@@ -100,7 +99,7 @@ function drawWheel() {
         ctx.lineWidth = 1;
         ctx.stroke();
         
-        const labelRadius = maxRadius + (maxRadius * 0.25);  // הגדלתי את המרחק ב-0.25
+        const labelRadius = maxRadius + (maxRadius * 0.25);  
         const labelAngle = startAngle + sectionAngle / 2;
         const labelX = Math.cos(labelAngle) * labelRadius;
         const labelY = Math.sin(labelAngle) * labelRadius;
@@ -114,7 +113,6 @@ function drawWheel() {
         ctx.fillText(section.name, 0, 0);
         ctx.restore();
 
-        // Adding the score numbers from 1 to 10
         const scoreAngle = startAngle + sectionAngle / 2;
         const scoreRadiusOffset = radiusStep * (section.score - 1); 
         const scoreX = Math.cos(scoreAngle) * (scoreRadiusOffset + radiusStep / 2);
@@ -137,26 +135,31 @@ function updateInputs() {
         const div = document.createElement("div");
         div.style.display = "flex";
         div.style.alignItems = "center";
-        
-        const input = document.createElement("input");
-        input.type = "text";
-        input.value = section.name;
-        input.className = "segment-input";
-        input.addEventListener("input", (event) => {
-            sections[index].name = event.target.value;
-            drawWheel();
+
+        const sectionLabel = document.createElement("span");
+        sectionLabel.textContent = section.name;
+        sectionLabel.style.cursor = 'pointer';
+        sectionLabel.style.marginRight = "10px";
+        sectionLabel.addEventListener('click', () => {
+            const newName = prompt("שנה שם סגמנט", section.name);
+            if (newName) {
+                section.name = newName;
+                drawWheel();
+            }
         });
         
         const deleteButton = document.createElement("button");
         deleteButton.textContent = "✖";
         deleteButton.style.marginLeft = "5px";
+        deleteButton.style.fontSize = "12px";
+        deleteButton.style.padding = "0 5px";
         deleteButton.addEventListener("click", () => {
             sections.splice(index, 1);
             updateInputs();
             drawWheel();
         });
-        
-        div.appendChild(input);
+
+        div.appendChild(sectionLabel);
         div.appendChild(deleteButton);
         inputContainer.appendChild(div);
     });
@@ -168,7 +171,6 @@ function resetScores() {
     drawWheel();
 }
 
-// Generate a random color
 function getRandomColor() {
     const letters = '0123456789ABCDEF';
     let color = '#';
@@ -178,7 +180,6 @@ function getRandomColor() {
     return color;
 }
 
-// Add new section with random color
 addSegmentButton.addEventListener('click', () => {
     const newSection = {
         name: "New Segment",
