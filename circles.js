@@ -16,7 +16,7 @@ function resizeCanvas() {
     canvas.height = height;
 
     // הגדרת המקסימום לפי הצד הקצר של הקנבס
-    maxRadius = Math.min(canvas.width, canvas.height) * 0.4;
+    maxRadius = Math.min(canvas.width, canvas.height) * 0.38;  // הקטנת הגלגל
     radiusStep = maxRadius / 10;
 
     drawWheel();
@@ -38,7 +38,7 @@ let maxRadius;
 let radiusStep;
 
 function updateDimensions() {
-    maxRadius = Math.min(canvas.width, canvas.height) * 0.4;
+    maxRadius = Math.min(canvas.width, canvas.height) * 0.38;  // הקטנת הגלגל
     radiusStep = maxRadius / 10;
 }
 
@@ -84,8 +84,8 @@ function handleClick(event) {
 function drawWheel() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // תזוזה למרכז הקנבס ולהנמכת הגלגל
-    ctx.translate(canvas.width / 2, canvas.height / 2 + 50);
+    // תזוזה למרכז הקנבס
+    ctx.translate(canvas.width / 2, canvas.height / 2);
 
     for (let i = 1; i <= 10; i++) {
         const radius = i * radiusStep;
@@ -144,6 +144,8 @@ function drawWheel() {
         ctx.fillText(section.score, 0, 0);
         ctx.restore();
     });
+
+    // Reset translation so that subsequent drawings aren't affected
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
