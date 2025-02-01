@@ -6,19 +6,21 @@ const inputContainer = document.getElementById("inputContainer");
 const addSegmentButton = document.getElementById('addSegmentButton');
 const editButton = document.getElementById('editButton');
 
-let editingIndex = -1;  // נשתמש בזה כדי לדעת אם אנחנו במצב עריכה של שם סגמנט
-let isEditing = false; // מצב עריכה - דיפולטיבי false
-let isDragging = false; // משתנה לגלילה
-let startX, startY; // משתנים לגרירה
+let editingIndex = -1;
+let isEditing = false;
+let isDragging = false;
+let startX, startY;
+
+let scaleFactor = 1; // Added scale factor to manage zoom
+let scaleSpeed = 0.1; // Speed of zoom
 
 function resizeCanvas() {
-    const width = window.innerWidth * 0.9; // גודל הקנבס 90% מהמסך
-    const height = window.innerHeight * 0.9; // גובה הקנבס 90% מהמסך
+    const width = window.innerWidth * 0.9;
+    const height = window.innerHeight * 0.9;
     canvas.width = width;
     canvas.height = height;
 
-    // הגדרת המקסימום לפי הצד הקצר של הקנבס
-    maxRadius = Math.min(canvas.width, canvas.height) * 0.38;  // הקטנת הגלגל
+    maxRadius = Math.min(canvas.width, canvas.height) * 0.38;
     radiusStep = maxRadius / 10;
 
     drawWheel();
@@ -40,7 +42,7 @@ let maxRadius;
 let radiusStep;
 
 function updateDimensions() {
-    maxRadius = Math.min(canvas.width, canvas.height) * 0.38;  // הקטנת הגלגל
+    maxRadius = Math.min(canvas.width, canvas.height) * 0.38 * scaleFactor;  // Modify max radius based on zoom scale
     radiusStep = maxRadius / 10;
 }
 
@@ -70,7 +72,6 @@ function handleClick(event) {
         const labelX = Math.cos(labelAngle) * sectionLabelRadius;
         const labelY = Math.sin(labelAngle) * sectionLabelRadius;
 
-        // אם לחצת על טקסט של סגמנט, תאפשר לשנות אותו
         if (Math.abs(clientX - rect.left - labelX) < 50 && Math.abs(clientY - rect.top - labelY) < 20) {
             editingIndex = sectionIndex;
             updateInputs();
@@ -86,7 +87,6 @@ function handleClick(event) {
 function drawWheel() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // תזוזה למרכז הקנבס
     ctx.translate(canvas.width / 2, canvas.height / 2);
 
     for (let i = 1; i <= 10; i++) {
@@ -103,14 +103,14 @@ function drawWheel() {
         const startAngle = index * sectionAngle - Math.PI / 2;
         const endAngle = startAngle + sectionAngle;
         const scoreRadius = section.score * radiusStep;
-    
+
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.arc(0, 0, scoreRadius, startAngle, endAngle);
         ctx.lineTo(0, 0);
         ctx.fillStyle = section.color;
         ctx.fill();
-    
+
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.arc(0, 0, maxRadius, startAngle, endAngle);
@@ -118,12 +118,12 @@ function drawWheel() {
         ctx.strokeStyle = '#666';
         ctx.lineWidth = 1;
         ctx.stroke();
-    
+
         const labelRadius = maxRadius + (maxRadius * 0.25);
         const labelAngle = startAngle + sectionAngle / 2;
         const labelX = Math.cos(labelAngle) * labelRadius;
         const labelY = Math.sin(labelAngle) * labelRadius;
-    
+
         ctx.save();
         ctx.translate(labelX, labelY);
         ctx.textAlign = 'center';
@@ -132,12 +132,12 @@ function drawWheel() {
         ctx.font = `${fontSize}px Arial`;
         ctx.fillText(section.name, 0, 0);
         ctx.restore();
-    
+
         const scoreAngle = startAngle + sectionAngle / 2;
         const scoreRadiusOffset = radiusStep * (section.score - 1);
         const scoreX = Math.cos(scoreAngle) * (scoreRadiusOffset + radiusStep / 2);
         const scoreY = Math.sin(scoreAngle) * (scoreRadiusOffset + radiusStep / 2);
-    
+
         ctx.save();
         ctx.translate(scoreX, scoreY);
         ctx.textAlign = 'center';
@@ -147,7 +147,6 @@ function drawWheel() {
         ctx.restore();
     });
 
-    // Reset translation so that subsequent drawings aren't affected
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
@@ -195,7 +194,6 @@ function resetScores() {
     drawWheel();
 }
 
-// Generate a random color
 function getRandomColor() {
     const letters = '0123456789ABCDEF';
     let color = '#';
@@ -205,7 +203,6 @@ function getRandomColor() {
     return color;
 }
 
-// Add new section with random color
 addSegmentButton.addEventListener('click', () => {
     const newSection = {
         name: "New Segment",
@@ -241,7 +238,19 @@ editButton.addEventListener('click', () => {
     updateInputs();
 });
 
-// גרירה לקנבס
+// Zooming with mouse wheel
+canvas.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    if (event.deltaY < 0) {
+        scaleFactor += scaleSpeed;
+    } else {
+        scaleFactor = Math.max(0.2, scaleFactor - scaleSpeed);  // Prevent zooming out too much
+    }
+    updateDimensions();
+    drawWheel();
+});
+
+// Dragging support
 canvas.addEventListener('mousedown', (e) => {
     isDragging = true;
     startX = e.clientX - canvas.offsetLeft;
