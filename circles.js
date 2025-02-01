@@ -8,6 +8,8 @@ const editButton = document.getElementById('editButton');
 
 let editingIndex = -1;  // נשתמש בזה כדי לדעת אם אנחנו במצב עריכה של שם סגמנט
 let isEditing = false; // מצב עריכה - דיפולטיבי false
+let isDragging = false; // משתנה לגלילה
+let startX, startY; // משתנים לגרירה
 
 function resizeCanvas() {
     const width = window.innerWidth * 0.9; // גודל הקנבס 90% מהמסך
@@ -101,14 +103,14 @@ function drawWheel() {
         const startAngle = index * sectionAngle - Math.PI / 2;
         const endAngle = startAngle + sectionAngle;
         const scoreRadius = section.score * radiusStep;
-
+    
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.arc(0, 0, scoreRadius, startAngle, endAngle);
         ctx.lineTo(0, 0);
         ctx.fillStyle = section.color;
         ctx.fill();
-
+    
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.arc(0, 0, maxRadius, startAngle, endAngle);
@@ -116,12 +118,12 @@ function drawWheel() {
         ctx.strokeStyle = '#666';
         ctx.lineWidth = 1;
         ctx.stroke();
-
+    
         const labelRadius = maxRadius + (maxRadius * 0.25);
         const labelAngle = startAngle + sectionAngle / 2;
         const labelX = Math.cos(labelAngle) * labelRadius;
         const labelY = Math.sin(labelAngle) * labelRadius;
-
+    
         ctx.save();
         ctx.translate(labelX, labelY);
         ctx.textAlign = 'center';
@@ -130,16 +132,16 @@ function drawWheel() {
         ctx.font = `${fontSize}px Arial`;
         ctx.fillText(section.name, 0, 0);
         ctx.restore();
-
+    
         const scoreAngle = startAngle + sectionAngle / 2;
-        const scoreRadiusOffset = radiusStep * (section.score - 1); 
+        const scoreRadiusOffset = radiusStep * (section.score - 1);
         const scoreX = Math.cos(scoreAngle) * (scoreRadiusOffset + radiusStep / 2);
         const scoreY = Math.sin(scoreAngle) * (scoreRadiusOffset + radiusStep / 2);
-
+    
         ctx.save();
         ctx.translate(scoreX, scoreY);
         ctx.textAlign = 'center';
-        ctx.fillStyle = '#fff';  
+        ctx.fillStyle = '#fff';
         ctx.font = `${Math.max(10, canvas.width * 0.02)}px Arial`;
         ctx.fillText(section.score, 0, 0);
         ctx.restore();
@@ -237,6 +239,36 @@ downloadButton.addEventListener('click', () => {
 editButton.addEventListener('click', () => {
     isEditing = !isEditing;
     updateInputs();
+});
+
+// גרירה לקנבס
+canvas.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    startX = e.clientX - canvas.offsetLeft;
+    startY = e.clientY - canvas.offsetTop;
+    canvas.style.cursor = 'grabbing';
+});
+
+canvas.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+
+    const x = e.clientX - canvas.offsetLeft;
+    const y = e.clientY - canvas.offsetTop;
+
+    const dx = x - startX;
+    const dy = y - startY;
+
+    canvas.style.transform = `translate(${dx}px, ${dy}px)`;
+});
+
+canvas.addEventListener('mouseup', () => {
+    isDragging = false;
+    canvas.style.cursor = 'grab';
+});
+
+canvas.addEventListener('mouseleave', () => {
+    isDragging = false;
+    canvas.style.cursor = 'grab';
 });
 
 resizeCanvas();
