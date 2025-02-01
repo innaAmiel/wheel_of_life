@@ -83,7 +83,9 @@ function handleClick(event) {
 
 function drawWheel() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.translate(canvas.width / 2 + 50, canvas.height / 2);
+
+    // תזוזה למרכז הקנבס ולהנמכת הגלגל
+    ctx.translate(canvas.width / 2, canvas.height / 2 + 50);
 
     for (let i = 1; i <= 10; i++) {
         const radius = i * radiusStep;
