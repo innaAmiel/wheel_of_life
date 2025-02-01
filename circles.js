@@ -6,21 +6,11 @@ const inputContainer = document.getElementById("inputContainer");
 const addSegmentButton = document.getElementById('addSegmentButton');
 const editButton = document.getElementById('editButton');
 
-let editingIndex = -1;  // נשתמש בזה כדי לדעת אם אנחנו במצב עריכה של שם סגמנט
+let editingIndex = -1; // נשתמש בזה כדי לדעת אם אנחנו במצב עריכה של שם סגמנט
 let isEditing = false; // מצב עריכה - דיפולטיבי false
 
-function resizeCanvas() {
-    const width = window.innerWidth * 0.9; // גודל הקנבס 90% מהמסך
-    const height = window.innerHeight * 0.9; // גובה הקנבס 90% מהמסך
-    canvas.width = width;
-    canvas.height = height;
-
-    // הגדרת המקסימום לפי הצד הקצר של הקנבס
-    maxRadius = Math.min(canvas.width, canvas.height) * 0.38;  // הקטנת הגלגל
-    radiusStep = maxRadius / 10;
-
-    drawWheel();
-}
+let maxRadius;
+let radiusStep;
 
 const sections = [
     { name: "משפחה וחברים", color: "#B6D8D2", score: 1 },
@@ -34,12 +24,17 @@ const sections = [
     { name: "קריירה", color: "#D0E0A5", score: 1 }
 ];
 
-let maxRadius;
-let radiusStep;
+function resizeCanvas() {
+    const width = window.innerWidth * 0.9; // גודל הקנבס 90% מהמסך
+    const height = window.innerHeight * 0.9; // גובה הקנבס 90% מהמסך
+    canvas.width = width;
+    canvas.height = height;
 
-function updateDimensions() {
+    // הגדרת המקסימום לפי הצד הקצר של הקנבס
     maxRadius = Math.min(canvas.width, canvas.height) * 0.38;  // הקטנת הגלגל
     radiusStep = maxRadius / 10;
+
+    drawWheel();
 }
 
 function handleClick(event) {
@@ -84,8 +79,8 @@ function handleClick(event) {
 function drawWheel() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // תזוזה למרכז הקנבס
-    ctx.translate(canvas.width / 2, canvas.height / 2);
+    // תזוזה למרכז הקנבס ולהנמכת הגלגל
+    ctx.translate(canvas.width / 2, canvas.height / 2 + 50);
 
     for (let i = 1; i <= 10; i++) {
         const radius = i * radiusStep;
@@ -144,8 +139,6 @@ function drawWheel() {
         ctx.fillText(section.score, 0, 0);
         ctx.restore();
     });
-
-    // Reset translation so that subsequent drawings aren't affected
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
@@ -216,15 +209,11 @@ addSegmentButton.addEventListener('click', () => {
 });
 
 canvas.addEventListener('click', handleClick);
-canvas.addEventListener('touchstart', handleClick, { passive: false });
-canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-}, { passive: false });
+canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handleClick(e); });
+canvas.addEventListener('touchmove', (e) => { e.preventDefault(); handleClick(e); });
+canvas.addEventListener('touchend', (e) => { e.preventDefault(); });
 
-window.addEventListener('resize', () => {
-    resizeCanvas();
-    updateDimensions();
-});
+window.addEventListener('resize', resizeCanvas);
 
 resetButton.addEventListener('click', resetScores);
 downloadButton.addEventListener('click', () => {
@@ -240,6 +229,3 @@ editButton.addEventListener('click', () => {
 });
 
 resizeCanvas();
-updateDimensions();
-updateInputs();
-drawWheel();
